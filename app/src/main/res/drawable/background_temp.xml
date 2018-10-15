@@ -6,8 +6,8 @@
     <item>
         <shape>
             <padding android:padding="0dp" />
-            <corners android:radius="0dp" />
-            <solid android:color="@android:color/white" />
+            <corners android:radius="8dp" />
+            <solid android:color="#003e2f" />
         </shape>
     </item>
 </ripple>

@@ -19,7 +19,7 @@ public class FirebaseUtil {
         return mFirebaseDatabase.getInstance();
     }
 
-    public static void manipulateNewWay(ChildEventListener childEventListener, DatabaseReference databaseReference,
+    public static void manipulateNewWay(DatabaseReference databaseReference,
                                         final TextView textView) {
         final DecimalFormat formatador = new DecimalFormat("0.0");
         ValueEventListener postListener = new ValueEventListener() {
