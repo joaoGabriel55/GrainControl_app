@@ -19,11 +19,15 @@
 #define TEMP_ID_4           4
 #define TEMP_NAME_4         "NTC Sensor4"
 
+#define TEMP_PIN_5          A4
+#define TEMP_ID_5           5
+#define TEMP_NAME_5         "NTC Sensor5"
+
 #define THING_NAME          "Knot Temp"
 #define PRINTING_TIME       30000
 
 //Equivale ao pino que sera ligado no NOVUS
-#define SETPOINT_ID         5
+#define SETPOINT_ID         6
 #define SETPOINT_NAME       "SetPoint"
 
 /* KNoTThing instance */
@@ -33,6 +37,7 @@ Thermistor temp1(TEMP_PIN_1);
 Thermistor temp2(TEMP_PIN_2);
 Thermistor temp3(TEMP_PIN_3);
 Thermistor temp4(TEMP_PIN_4);
+Thermistor temp5(TEMP_PIN_5);
 
 /* Variable that holds LED value */
 int32_t temp_value_1 = 0;
@@ -136,7 +141,7 @@ void setup(void)
 void loop(void) {
   thing.run();
 
-  int avgTemp = (temp1.getTemp() + temp2.getTemp() + temp3.getTemp() + temp4.getTemp()) * 100 / 4;
+  int avgTemp = (temp1.getTemp() + temp2.getTemp() + temp3.getTemp() + temp4.getTemp() + temp5.getTemp()) * 100 / 5;
 
   Serial.print(temp1.getTemp());
   Serial.print("/");
@@ -145,6 +150,8 @@ void loop(void) {
   Serial.print(temp3.getTemp());
   Serial.print("/");
   Serial.print(temp4.getTemp());
+  Serial.print("/");
+  Serial.print(temp5.getTemp());
   Serial.print("/ AVG: ");
   Serial.println(avgTemp);
   Serial.print("/ SP: ");

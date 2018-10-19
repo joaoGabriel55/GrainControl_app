@@ -92,11 +92,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onStart() {
         super.onStart();
-
+        final Double[] tempAux = {0.0};
         temperaturaAvg.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -105,23 +104,33 @@ public class MainActivity extends AppCompatActivity {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Double value = snapshot.getValue(Double.class);
-                    dp[index] = new DataPoint(index, value);
+
+                    if (value.doubleValue() >= 1.0) {
+                        dp[index] = new DataPoint(index, value);
+                        tempAux[0] = value;
+                    } else {
+                        dp[index] = new DataPoint(index, tempAux[0]);
+                    }
+
+
                     index++;
                 }
 
-                series.resetData(dp);
-                series.setDrawBackground(true);
-                series.setAnimated(true);
-                series.setDrawDataPoints(true);
+                if (dp != null) {
+                    series.resetData(dp);
+                    series.setDrawBackground(true);
+                    series.setAnimated(true);
+                    series.setDrawDataPoints(true);
 
-                series.setOnDataPointTapListener(new OnDataPointTapListener() {
-                    @Override
-                    public void onTap(Series series, DataPointInterface dataPoint) {
-                        Toast.makeText(graph.getContext(), "Avg Temperature: "+dataPoint, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    series.setOnDataPointTapListener(new OnDataPointTapListener() {
+                        @Override
+                        public void onTap(Series series, DataPointInterface dataPoint) {
+                            Toast.makeText(graph.getContext(), "Avg Temperature: " + dataPoint, Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                graph.addSeries(series);
+                    graph.addSeries(series);
+                }
             }
 
             @Override

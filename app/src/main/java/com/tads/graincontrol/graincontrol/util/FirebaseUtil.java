@@ -31,10 +31,10 @@ public class FirebaseUtil {
                 Double value = dataSnapshot.getValue(Double.class);
 
                 if (value != null) {
-                    if (value.doubleValue() < 0.0)
-                        textView.setText("0.0");
-                    else
+                    if (value.doubleValue() >= 1.0)
                         textView.setText(formatador.format(value.doubleValue()));
+//                    else
+//                        textView.setText("0.0");
                 }
             }
 
@@ -57,6 +57,7 @@ public class FirebaseUtil {
                     tempAvg.add(avg);
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 //TODO
