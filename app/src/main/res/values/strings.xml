@@ -3,7 +3,7 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Chart</string>
     <string name="set_point">Temperature:</string>
-    <string name="average">Average Temperature:</string>
+    <string name="average">Average Temperature</string>
     <string name="yes">Ok</string>
     <string name="no">Cancel</string>
     <string name="defineSetPoint">Set the Silo SetPoint</string>

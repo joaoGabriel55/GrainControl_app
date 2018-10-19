@@ -10,6 +10,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FirebaseUtil {
 
@@ -28,11 +30,12 @@ public class FirebaseUtil {
                 // Get Post object and use the values to update the UI
                 Double value = dataSnapshot.getValue(Double.class);
 
-                if (value.doubleValue() < 0.0)
-                    textView.setText("0.0");
-                else
-                    textView.setText(formatador.format(value.doubleValue()));
-
+                if (value != null) {
+                    if (value.doubleValue() < 0.0)
+                        textView.setText("0.0");
+                    else
+                        textView.setText(formatador.format(value.doubleValue()));
+                }
             }
 
             @Override
@@ -43,6 +46,23 @@ public class FirebaseUtil {
         };
         databaseReference.addValueEventListener(postListener);
 
+    }
+
+    public static void manipulateAvgSensors(final List<Double> tempAvg, DatabaseReference databaseReference) {
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Double avg = postSnapshot.getValue(Double.class);
+                    tempAvg.add(avg);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO
+            }
+        };
+        databaseReference.addValueEventListener(postListener);
     }
 
 }
