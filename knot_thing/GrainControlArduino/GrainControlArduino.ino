@@ -44,7 +44,7 @@ int32_t temp_value_1 = 0;
 
 static int32_t setPoint_value = 0;
 
-float deltaTemp = 0.5; // variação aceitável 
+float deltaTemp = 0.5; // variação aceitável
 
 /* Print a timestamp via Serial */
 static void printTimestamp(void) {
@@ -112,10 +112,10 @@ static int setPoint_write(int32_t *val, int32_t *multiplier)
 void setup(void)
 {
   Serial.begin(9600);
-  
+ 
   pinMode(8, OUTPUT);
   //digitalWrite(8, LOW);
-  
+
   /* init KNoTThing library */
   thing.init(THING_NAME);
 
@@ -143,30 +143,35 @@ void loop(void) {
 
   int avgTemp = (temp1.getTemp() + temp2.getTemp() + temp3.getTemp() + temp4.getTemp() + temp5.getTemp()) * 100 / 5;
 
-  Serial.print(temp1.getTemp());
-  Serial.print("/");
-  Serial.print(temp2.getTemp());
-  Serial.print("/");
-  Serial.print(temp3.getTemp());
-  Serial.print("/");
-  Serial.print(temp4.getTemp());
-  Serial.print("/");
-  Serial.print(temp5.getTemp());
-  Serial.print("/ AVG: ");
-  Serial.println(avgTemp);
-  Serial.print("/ SP: ");
-  Serial.println(setPoint_value);
-  
+  //  Serial.print(temp1.getTemp());
+  //  Serial.print("/");
+  //  Serial.print(temp2.getTemp());
+  //  Serial.print("/");
+  //  Serial.print(temp3.getTemp());
+  //  Serial.print("/");
+  //  Serial.print(temp4.getTemp());
+  //  Serial.print("/");
+  //  Serial.print(temp5.getTemp());
+  //  Serial.print("/ AVG: ");
+  //  Serial.print(avgTemp);
+  //  Serial.print("/ SP: ");
+  Serial.print(setPoint_value);
+  Serial.print(";");
+
   float avgControl = avgTemp / 100.0;
-  Serial.println(avgControl);
-  
+
+  Serial.print(avgControl);
+  Serial.print(";");
+
   temp_value_1 = avgTemp;
-  
+
   if (avgControl < setPoint_value - deltaTemp) {
     digitalWrite(8, HIGH);
+    Serial.println(1);
   } else if (avgControl > setPoint_value + deltaTemp) {
     digitalWrite(8, LOW);
+    Serial.println(0);
   }
-  
-  
+
+
 }

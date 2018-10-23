@@ -15,10 +15,14 @@ import java.util.List;
 
 public class FirebaseUtil {
 
-    private static FirebaseDatabase mFirebaseDatabase;
+    private static FirebaseDatabase mDatabase;
 
     public static FirebaseDatabase getFirebaseDatabase() {
-        return mFirebaseDatabase.getInstance();
+        if (mDatabase == null) {
+            mDatabase = FirebaseDatabase.getInstance();
+            mDatabase.setPersistenceEnabled(true);
+        }
+        return mDatabase;
     }
 
     public static void manipulateNewWay(DatabaseReference databaseReference,
