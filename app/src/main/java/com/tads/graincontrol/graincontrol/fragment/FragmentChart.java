@@ -1,5 +1,6 @@
 package com.tads.graincontrol.graincontrol.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -20,21 +22,25 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 import com.tads.graincontrol.graincontrol.R;
-import com.tads.graincontrol.graincontrol.util.FirebaseUtil;
+import com.tads.graincontrol.graincontrol.util.GrainControlUtils;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
 
 public class FragmentChart extends Fragment {
 
     private View view;
 
     private LineGraphSeries<DataPoint> series;
+    private LineGraphSeries<DataPoint> seriesSP;
     private ArrayList<Double> tempAvg;
 
     private DatabaseReference temperaturaAvg;
+    private DatabaseReference setPointDataBase;
+
     private GraphView graph;
 
+    private TextView dateTV;
 
     @Nullable
     @Override
@@ -45,18 +51,28 @@ public class FragmentChart extends Fragment {
         listenerParams(view);
 
         series = new LineGraphSeries();
+        seriesSP = new LineGraphSeries();
         graph = (GraphView) view.findViewById(R.id.graphView);
+
+        dateTV = view.findViewById(R.id.dateGraph);
+
+        //dateTV.setText(Calendar.getInstance().getTime().toString());
+
+        GrainControlUtils.getTime(getActivity(), dateTV);
+
         initGraph();
         return view;
     }
 
     private void listenerParams(View view) {
-        temperaturaAvg = FirebaseUtil.getFirebaseDatabase().getReference("temperaturaSensorAvg");
-        //FirebaseUtil.manipulateAvgSensors(tempAvg, temperaturaAvg);
+        temperaturaAvg = GrainControlUtils.getFirebaseDatabase().getReference("temperaturaSensorAvg");
+        setPointDataBase = GrainControlUtils.getFirebaseDatabase().getReference("setpoint");
+        //GrainControlUtils.manipulateAvgSensors(tempAvg, temperaturaAvg);
     }
 
     private void initGraph() {
         final Double[] tempAux = {0.0};
+        final Double[] spAux = {0.0};
         temperaturaAvg.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -72,7 +88,6 @@ public class FragmentChart extends Fragment {
                     } else {
                         dp[index] = new DataPoint(index, tempAux[0]);
                     }
-
 
                     index++;
                 }
@@ -99,6 +114,50 @@ public class FragmentChart extends Fragment {
 
             }
         });
+
+        setPointDataBase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                DataPoint[] dpSp = new DataPoint[1];
+                int index = 0;
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Double value = snapshot.getValue(Double.class);
+
+                    if (value.doubleValue() >= 1.0) {
+                        dpSp[index] = new DataPoint(0, value);
+                        spAux[0] = value;
+                    } else {
+                        dpSp[index] = new DataPoint(index, spAux[0]);
+                    }
+
+                    index++;
+                }
+
+                if (dpSp != null) {
+                    seriesSP.resetData(dpSp);
+                    seriesSP.setColor(Color.GREEN);
+                    seriesSP.setAnimated(true);
+                    seriesSP.setDrawDataPoints(true);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         graph.addSeries(series);
+        graph.addSeries(seriesSP);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(9);
+        graph.getViewport().setMinY(15.0);
+        graph.getViewport().setMaxY(40.0);
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setXAxisBoundsManual(true);
     }
 }

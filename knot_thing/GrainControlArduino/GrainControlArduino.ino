@@ -39,12 +39,17 @@ Thermistor temp3(TEMP_PIN_3);
 Thermistor temp4(TEMP_PIN_4);
 Thermistor temp5(TEMP_PIN_5);
 
+Thermistor tempExt(A5);
+
+
 /* Variable that holds LED value */
 int32_t temp_value_1 = 0;
 
-static int32_t setPoint_value = 0;
+static int32_t setPoint_value = 20;
 
-float deltaTemp = 0.5; // variação aceitável
+float deltaTemp = 1.0; // variação aceitável
+
+int stats = 0;
 
 /* Print a timestamp via Serial */
 static void printTimestamp(void) {
@@ -76,8 +81,10 @@ static void printTimestamp(void) {
 static int temp_read_1(int32_t *val)
 {
   *val = temp_value_1;
-  Serial.print(F("Temp value1: "));
-  Serial.println(*val);
+  //Serial.print(F("temp_read_1(): "));
+  //Serial.print(*val);
+  //Serial.print(";");
+
   return 0;
 }
 
@@ -85,8 +92,9 @@ static int temp_read_1(int32_t *val)
 static int temp_write_1(int32_t *val)
 {
   temp_value_1 = *val;
-  Serial.print(F("Temp value1: "));
-  Serial.println(*val);
+  //Serial.print(F("temp_write_1(): "));
+  //Serial.print(*val);
+  //Serial.print(";");
 
   return 0;
 }
@@ -95,16 +103,17 @@ static int setPoint_read(int32_t *val, int32_t *multiplier)
 {
 
   *val = setPoint_value;
-  Serial.print(F("setPoint_read(): "));
-  Serial.println(*val);
+  //Serial.print(*val);
+  //Serial.print(";");
+
   return 0;
 }
 
 static int setPoint_write(int32_t *val, int32_t *multiplier)
 {
   setPoint_value = *val;
-  Serial.print(F("setPoint_write(): "));
-  Serial.println(*val);
+  //Serial.print(*val);
+  //Serial.print(";");
   return 0;
 }
 
@@ -112,7 +121,7 @@ static int setPoint_write(int32_t *val, int32_t *multiplier)
 void setup(void)
 {
   Serial.begin(9600);
- 
+
   pinMode(8, OUTPUT);
   //digitalWrite(8, LOW);
 
@@ -129,16 +138,17 @@ void setup(void)
                         KNOT_TYPE_ID_TEMPERATURE, KNOT_UNIT_TEMPERATURE_C,
                         temp_read_1, temp_write_1);
 
-  /* Send data every 30 seconds */
+  /* Send data every 10 seconds */
   thing.registerDefaultConfig(TEMP_ID_1,
-                              KNOT_EVT_FLAG_TIME | KNOT_EVT_FLAG_CHANGE,
-                              30, 0, 0, 0, 0);
+                              KNOT_EVT_FLAG_TIME, 10, 0, 0, 0, 0);
 
   /* Print thing name via Serial */
   Serial.println(F(THING_NAME));
+  //delay(625);
 }
 
 void loop(void) {
+  long start = millis();
   thing.run();
 
   int avgTemp = (temp1.getTemp() + temp2.getTemp() + temp3.getTemp() + temp4.getTemp() + temp5.getTemp()) * 100 / 5;
@@ -156,22 +166,39 @@ void loop(void) {
   //  Serial.print(avgTemp);
   //  Serial.print("/ SP: ");
   Serial.print(setPoint_value);
-  Serial.print(";");
+  Serial.print(" ");
 
   float avgControl = avgTemp / 100.0;
 
+  Serial.print(tempExt.getTemp());
+  Serial.print(" ");
+
   Serial.print(avgControl);
-  Serial.print(";");
+  Serial.print(" ");
 
   temp_value_1 = avgTemp;
 
+
   if (avgControl < setPoint_value - deltaTemp) {
+    stats = 1;
     digitalWrite(8, HIGH);
-    Serial.println(1);
+    //Serial.println("1");
   } else if (avgControl > setPoint_value + deltaTemp) {
+    stats = 0;
     digitalWrite(8, LOW);
-    Serial.println(0);
+    //Serial.println("0");
   }
+
+  Serial.print(stats);
+  Serial.print(" ");
+  
+  long finish = millis();
+
+  long deltaT = finish - start;
+  Serial.println(deltaT);
+  //delayMicroseconds(625);
+
+
 
 
 }

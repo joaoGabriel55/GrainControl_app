@@ -1,5 +1,6 @@
 package com.tads.graincontrol.graincontrol.util;
 
+import android.app.Activity;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -9,11 +10,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-public class FirebaseUtil {
+public class GrainControlUtils {
 
     private static FirebaseDatabase mDatabase;
 
@@ -68,6 +73,33 @@ public class FirebaseUtil {
             }
         };
         databaseReference.addValueEventListener(postListener);
+    }
+
+    public static void getTime(final Activity activity, final TextView textView) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (!isInterrupted()) {
+                        Thread.sleep(1000);
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // update TextView here!
+                                Calendar.getInstance().getTime();
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
+                                textView.setText(sdf.format(Calendar.getInstance().getTime()));
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        thread.start();
+
+
     }
 
 }

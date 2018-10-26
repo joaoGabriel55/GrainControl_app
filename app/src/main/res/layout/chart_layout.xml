@@ -32,7 +32,7 @@
 
             <com.jjoe64.graphview.GraphView
                 android:id="@+id/graphView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="350dp" />
 
             <View
@@ -50,8 +50,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/graphView"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="25dp"
                 android:fontFamily="@font/google_sans_medium"
                 android:maxLines="3"
                 android:text="Avg Temperature Graph"
@@ -59,10 +59,11 @@
                 android:textSize="22dp" />
 
             <TextView
+                android:id="@+id/dateGraph"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/title"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="4dp"
                 android:maxLines="3"
                 android:text="18/10/2018"
                 android:textColor="#666"
