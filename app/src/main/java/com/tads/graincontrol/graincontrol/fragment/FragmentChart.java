@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +26,12 @@ import com.tads.graincontrol.graincontrol.R;
 import com.tads.graincontrol.graincontrol.util.GrainControlUtils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class FragmentChart extends Fragment {
 
     private View view;
 
     private LineGraphSeries<DataPoint> series;
-    private LineGraphSeries<DataPoint> seriesSP;
     private ArrayList<Double> tempAvg;
 
     private DatabaseReference temperaturaAvg;
@@ -41,6 +40,8 @@ public class FragmentChart extends Fragment {
     private GraphView graph;
 
     private TextView dateTV;
+
+    private LineGraphSeries<DataPoint> seriesSP;
 
     @Nullable
     @Override
@@ -51,11 +52,11 @@ public class FragmentChart extends Fragment {
         listenerParams(view);
 
         series = new LineGraphSeries();
-        seriesSP = new LineGraphSeries();
         graph = (GraphView) view.findViewById(R.id.graphView);
 
         dateTV = view.findViewById(R.id.dateGraph);
 
+        setPointDataBase = GrainControlUtils.getFirebaseDatabase().getReference("setpoint").child("valor");
         //dateTV.setText(Calendar.getInstance().getTime().toString());
 
         GrainControlUtils.getTime(getActivity(), dateTV);
@@ -73,6 +74,7 @@ public class FragmentChart extends Fragment {
     private void initGraph() {
         final Double[] tempAux = {0.0};
         final Double[] spAux = {0.0};
+        final Double[] valueSetPoint = new Double[1];
         temperaturaAvg.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -104,8 +106,6 @@ public class FragmentChart extends Fragment {
                             Toast.makeText(graph.getContext(), "Avg Temperature: " + dataPoint, Toast.LENGTH_SHORT).show();
                         }
                     });
-
-
                 }
             }
 
@@ -118,40 +118,21 @@ public class FragmentChart extends Fragment {
         setPointDataBase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                DataPoint[] dpSp = new DataPoint[1];
-                int index = 0;
 
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Double value = snapshot.getValue(Double.class);
-
-                    if (value.doubleValue() >= 1.0) {
-                        dpSp[index] = new DataPoint(0, value);
-                        spAux[0] = value;
-                    } else {
-                        dpSp[index] = new DataPoint(index, spAux[0]);
-                    }
-
-                    index++;
-                }
-
-                if (dpSp != null) {
-                    seriesSP.resetData(dpSp);
-                    seriesSP.setColor(Color.GREEN);
-                    seriesSP.setAnimated(true);
-                    seriesSP.setDrawDataPoints(true);
-
-                }
+                Double value = dataSnapshot.getValue(Double.class);
+                Log.i("EAE", value + "");
+                seriesSP = new LineGraphSeries<>(generateData(value));
+                seriesSP.setAnimated(true);
+                seriesSP.setColor(Color.RED);
+                seriesSP.setTitle("People");
+                graph.addSeries(seriesSP);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
 
-
         graph.addSeries(series);
-        graph.addSeries(seriesSP);
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(9);
         graph.getViewport().setMinY(15.0);
@@ -159,5 +140,15 @@ public class FragmentChart extends Fragment {
 
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setXAxisBoundsManual(true);
+    }
+
+    private DataPoint[] generateData(Double value) {
+        int count = 10;
+        DataPoint[] values = new DataPoint[count];
+        for (int i = 0; i < count; i++) {
+            DataPoint v = new DataPoint(i, value);
+            values[i] = v;
+        }
+        return values;
     }
 }
