@@ -1,12 +1,16 @@
 package com.tads.graincontrol.graincontrol;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.tads.graincontrol.graincontrol.activity.AboutActivity;
 import com.tads.graincontrol.graincontrol.fragment.FragmentChart;
 import com.tads.graincontrol.graincontrol.fragment.FragmentSilo;
 
@@ -52,4 +56,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return loadFragment(fragment);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.about, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.about_app:
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                return true;
+        }
+        return false;
+    }
 }

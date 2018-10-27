@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GrainControl</string>
+    <string name="app_name">Grain Control</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Chart</string>
     <string name="set_point">Temperature:</string>
@@ -8,4 +8,12 @@
     <string name="no">Cancel</string>
     <string name="defineSetPoint">Set the Silo SetPoint</string>
     <string name="ok">Ok</string>
+    <string name="samples">Samples</string>
+    <string name="temperature">Temperature</string>
+    <string name="unit">°C</string>
+    <string name="setpoint_label">SetPoint</string>
+    <string name="toast_text_validation">Avg Temperature:</string>
+    <string name="title_graph_legend">Avg Temp.</string>
+    <string name="content_validation_toast">SetPoint out of interval [20 - 50]</string>
+    <string name="about_link">About</string>
 </resources>

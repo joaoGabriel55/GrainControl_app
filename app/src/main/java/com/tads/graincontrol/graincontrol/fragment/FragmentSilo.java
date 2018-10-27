@@ -83,7 +83,7 @@ public class FragmentSilo extends Fragment {
                             if(tempNum >= 20  && tempNum <= 50)
                                 setPointDataBase.setValue(tempNum);
                             else
-                                Toast.makeText(getContext(), "SetPoint out of interval [20 - 50]", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), getString(R.string.content_validation_toast), Toast.LENGTH_SHORT).show();
 
                         }
 

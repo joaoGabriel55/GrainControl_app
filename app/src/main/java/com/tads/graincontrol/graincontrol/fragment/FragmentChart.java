@@ -1,5 +1,6 @@
 package com.tads.graincontrol.graincontrol.fragment;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
@@ -103,7 +105,7 @@ public class FragmentChart extends Fragment {
                     series.setOnDataPointTapListener(new OnDataPointTapListener() {
                         @Override
                         public void onTap(Series series, DataPointInterface dataPoint) {
-                            Toast.makeText(graph.getContext(), "Avg Temperature: " + dataPoint, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(graph.getContext(), getString(R.string.toast_text_validation) + " " + dataPoint, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -124,22 +126,36 @@ public class FragmentChart extends Fragment {
                 seriesSP = new LineGraphSeries<>(generateData(value));
                 seriesSP.setAnimated(true);
                 seriesSP.setColor(Color.RED);
-                seriesSP.setTitle("People");
                 graph.addSeries(seriesSP);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
         });
 
         graph.addSeries(series);
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(9);
         graph.getViewport().setMinY(15.0);
-        graph.getViewport().setMaxY(40.0);
-
+        graph.getViewport().setMaxY(50.0);
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setXAxisBoundsManual(true);
+        graph.getGridLabelRenderer().setHorizontalAxisTitle(getString(R.string.samples));
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    // show normal x values
+                    return super.formatLabel(value, isValueX);
+                } else {
+                    // show currency for y values
+                    return super.formatLabel(value, isValueX) + " " + getString(R.string.unit);
+                }
+            }
+        });
+
+
     }
 
     private DataPoint[] generateData(Double value) {
