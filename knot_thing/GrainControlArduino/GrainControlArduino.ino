@@ -47,35 +47,9 @@ int32_t temp_value_1 = 0;
 
 static int32_t setPoint_value = 20;
 
-float deltaTemp = 1.0; // variação aceitável
+float deltaTemp = 0.5; // variação aceitável
 
 int stats = 0;
-
-/* Print a timestamp via Serial */
-static void printTimestamp(void) {
-  static long current_millis = 0, print_millis = 0, hour = 0, minute = 0, sec = 0;
-
-  if (millis() - current_millis >= 10000) {
-    sec++;
-    if (sec >= 60) {
-      minute++;
-      sec = 0;
-      if (minute >= 60) {
-        hour++;
-        minute = 0;
-      }
-    }
-    current_millis = millis();
-  }
-  if (millis() - print_millis >= PRINTING_TIME) {
-    Serial.print(hour);
-    Serial.print(":");
-    Serial.print(minute);
-    Serial.print(":");
-    Serial.println(sec);
-    print_millis = millis();
-  }
-}
 
 /* Function used by KNoTThing for read the LED value */
 static int temp_read_1(int32_t *val)
@@ -181,11 +155,11 @@ void loop(void) {
 
   if (avgControl < setPoint_value - deltaTemp) {
     stats = 1;
-    digitalWrite(8, HIGH);
+    digitalWrite(3, HIGH);
     //Serial.println("1");
   } else if (avgControl > setPoint_value + deltaTemp) {
     stats = 0;
-    digitalWrite(8, LOW);
+    digitalWrite(3, LOW);
     //Serial.println("0");
   }
 
@@ -197,8 +171,4 @@ void loop(void) {
   long deltaT = finish - start;
   Serial.println(deltaT);
   //delayMicroseconds(625);
-
-
-
-
 }

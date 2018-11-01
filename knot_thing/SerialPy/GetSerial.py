@@ -14,16 +14,18 @@ comport.write(PARAM_ASCII)
 
 cont = 0
 file = open('testfile.txt','w')
-end_time = time.time() + 160
+end_time = time.time() + 60 * 10
 print "Start : %s" % time.time()
-while(time.time() <= end_time):
+while True:
     VALUE_SERIAL=comport.readline()
     
     print '%s' % (VALUE_SERIAL)
     #time.sleep(1)
     file.write(VALUE_SERIAL) 
-    cont = cont + 1
- 
+
+    if time.time() >= end_time:
+        break
+
 # Fechando conexao serial
 comport.close()
 print "End : %s" % time.time()

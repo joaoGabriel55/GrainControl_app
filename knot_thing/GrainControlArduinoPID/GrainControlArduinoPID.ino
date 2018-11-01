@@ -1,3 +1,5 @@
+#include <AutoPID.h>
+
 #include <KNoTThing.h>
 #include <Thermistor.h>
 
@@ -30,6 +32,18 @@
 #define SETPOINT_ID         6
 #define SETPOINT_NAME       "SetPoint"
 
+//pins
+#define OUTPUT_PIN 3
+
+#define TEMP_READ_DELAY 55 //can only read digital temp sensor every ~750ms
+
+//pid settings and gains
+#define OUTPUT_MIN 0
+#define OUTPUT_MAX 255
+#define KP 1/0.6
+#define KI KP/1.77
+#define KD KP*6
+
 /* KNoTThing instance */
 KNoTThing thing;
 
@@ -41,7 +55,6 @@ Thermistor temp5(TEMP_PIN_5);
 
 Thermistor tempExt(A5);
 
-
 /* Variable that holds LED value */
 int32_t temp_value_1 = 0;
 
@@ -51,35 +64,36 @@ float deltaTemp = 1.0; // variação aceitável
 
 int stats = 0;
 
-/* Print a timestamp via Serial */
-static void printTimestamp(void) {
-  static long current_millis = 0, print_millis = 0, hour = 0, minute = 0, sec = 0;
+double temperature, setPoint, outputVal, avg;
 
-  if (millis() - current_millis >= 10000) {
-    sec++;
-    if (sec >= 60) {
-      minute++;
-      sec = 0;
-      if (minute >= 60) {
-        hour++;
-        minute = 0;
-      }
-    }
-    current_millis = millis();
+//input/output variables passed by reference, so they are updated automatically
+AutoPID myPID(&temperature, &setPoint, &outputVal, OUTPUT_MIN, OUTPUT_MAX, KP, KI, KD);
+
+unsigned long lastTempUpdate; //tracks clock time of last temp update
+
+//call repeatedly in loop, only updates after a certain time interval
+//returns true if update happened
+bool updateTemperature() {
+
+  double temperature1 = temp1.getTemp();
+  double temperature2 = temp2.getTemp();
+  double temperature3 = temp3.getTemp();
+  double temperature4 = temp4.getTemp();
+  double temperature5 = temp5.getTemp();
+
+  avg = (temperature1 + temperature2 + temperature3 + temperature4 + temperature5) / 5;
+
+  if ((millis() - lastTempUpdate) > TEMP_READ_DELAY) {
+    temperature = avg; //get temp reading
+    temp_value_1 = avg * 100;
+    lastTempUpdate = millis();
+    return true;
   }
-  if (millis() - print_millis >= PRINTING_TIME) {
-    Serial.print(hour);
-    Serial.print(":");
-    Serial.print(minute);
-    Serial.print(":");
-    Serial.println(sec);
-    print_millis = millis();
-  }
-}
+  return false;
+}//void updateTemperature
 
 /* Function used by KNoTThing for read the LED value */
-static int temp_read_1(int32_t *val)
-{
+static int temp_read_1(int32_t *val) {
   *val = temp_value_1;
   //Serial.print(F("temp_read_1(): "));
   //Serial.print(*val);
@@ -89,8 +103,7 @@ static int temp_read_1(int32_t *val)
 }
 
 /* Function used by KNoTThing for write the LED value */
-static int temp_write_1(int32_t *val)
-{
+static int temp_write_1(int32_t *val) {
   temp_value_1 = *val;
   //Serial.print(F("temp_write_1(): "));
   //Serial.print(*val);
@@ -99,8 +112,7 @@ static int temp_write_1(int32_t *val)
   return 0;
 }
 
-static int setPoint_read(int32_t *val, int32_t *multiplier)
-{
+static int setPoint_read(int32_t *val, int32_t *multiplier) {
 
   *val = setPoint_value;
   //Serial.print(*val);
@@ -109,8 +121,7 @@ static int setPoint_read(int32_t *val, int32_t *multiplier)
   return 0;
 }
 
-static int setPoint_write(int32_t *val, int32_t *multiplier)
-{
+static int setPoint_write(int32_t *val, int32_t *multiplier) {
   setPoint_value = *val;
   //Serial.print(*val);
   //Serial.print(";");
@@ -118,9 +129,18 @@ static int setPoint_write(int32_t *val, int32_t *multiplier)
 }
 
 
-void setup(void)
-{
+void setup(void) {
   Serial.begin(9600);
+
+  TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20);
+  TCCR2B = TCCR2B & B11111000 | B00000111;
+
+  while (!updateTemperature()) {} //wait until temp sensor updated
+
+  //if temperature is more than 4 degrees below or above setpoint, OUTPUT will be set to min or max respectively
+  //myPID.setBangBang(1.0);
+  //set PID update interval to 4000ms
+  //myPID.setTimeStep(1000);
 
   pinMode(8, OUTPUT);
   //digitalWrite(8, LOW);
@@ -151,54 +171,29 @@ void loop(void) {
   long start = millis();
   thing.run();
 
-  int avgTemp = (temp1.getTemp() + temp2.getTemp() + temp3.getTemp() + temp4.getTemp() + temp5.getTemp()) * 100 / 5;
+  setPoint = setPoint_value;
 
-  //  Serial.print(temp1.getTemp());
-  //  Serial.print("/");
-  //  Serial.print(temp2.getTemp());
-  //  Serial.print("/");
-  //  Serial.print(temp3.getTemp());
-  //  Serial.print("/");
-  //  Serial.print(temp4.getTemp());
-  //  Serial.print("/");
-  //  Serial.print(temp5.getTemp());
-  //  Serial.print("/ AVG: ");
-  //  Serial.print(avgTemp);
-  //  Serial.print("/ SP: ");
+  updateTemperature();
+
+  myPID.run();
+
   Serial.print(setPoint_value);
   Serial.print(" ");
-
-  float avgControl = avgTemp / 100.0;
 
   Serial.print(tempExt.getTemp());
   Serial.print(" ");
 
-  Serial.print(avgControl);
+  Serial.print(avg);
   Serial.print(" ");
 
-  temp_value_1 = avgTemp;
-
-
-  if (avgControl < setPoint_value - deltaTemp) {
-    stats = 1;
-    digitalWrite(8, HIGH);
-    //Serial.println("1");
-  } else if (avgControl > setPoint_value + deltaTemp) {
-    stats = 0;
-    digitalWrite(8, LOW);
-    //Serial.println("0");
-  }
-
-  Serial.print(stats);
+  Serial.print(outputVal);  
   Serial.print(" ");
-  
+
+  analogWrite(OUTPUT_PIN, outputVal);
+
   long finish = millis();
 
   long deltaT = finish - start;
   Serial.println(deltaT);
   //delayMicroseconds(625);
-
-
-
-
 }
