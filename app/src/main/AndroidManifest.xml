@@ -27,7 +27,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".activity.AboutActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.TransparentTheme"></activity>
     </application>
 
 </manifest>
