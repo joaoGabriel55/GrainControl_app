@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         if (fragment != null) {
             supportFragmentManager
                     .beginTransaction()
+                    .setCustomAnimations(R.anim.exit_to_right, R.anim.exit_to_right, R.anim.exit_to_right, R.anim.exit_to_right)
                     .replace(R.id.fragment_container, fragment)
                     .commit()
             return true

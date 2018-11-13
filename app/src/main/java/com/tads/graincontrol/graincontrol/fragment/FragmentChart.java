@@ -56,12 +56,11 @@ public class FragmentChart extends Fragment {
         series = new LineGraphSeries();
         graph = (GraphView) view.findViewById(R.id.graphView);
 
-        dateTV = view.findViewById(R.id.dateGraph);
+        //dateTV = view.findViewById(R.id.dateGraph);
 
         setPointDataBase = GrainControlUtils.getFirebaseDatabase().getReference("setpoint").child("valor");
-        //dateTV.setText(Calendar.getInstance().getTime().toString());
 
-        GrainControlUtils.getTime(getActivity(), dateTV);
+        //GrainControlUtils.getTime(getActivity(), dateTV);
 
         initGraph();
         return view;
