@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -97,6 +98,7 @@ public class FragmentChart extends Fragment {
 
                 if (dp != null) {
                     series.resetData(dp);
+                    series.setTitle("Avg Temp.");
                     series.setDrawBackground(true);
                     series.setAnimated(true);
                     series.setDrawDataPoints(true);
@@ -124,6 +126,7 @@ public class FragmentChart extends Fragment {
                 Log.i("EAE", value + "");
                 seriesSP = new LineGraphSeries<>(generateData(value));
                 seriesSP.setAnimated(true);
+                seriesSP.setTitle("Setpoint");
                 seriesSP.setColor(Color.RED);
                 graph.addSeries(seriesSP);
             }
@@ -134,6 +137,11 @@ public class FragmentChart extends Fragment {
         });
 
         graph.addSeries(series);
+        graph.getLegendRenderer().setVisible(true);
+        //graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        graph.getLegendRenderer().setFixedPosition(500, 0);
+        graph.getLegendRenderer().setWidth(270);
+        graph.getLegendRenderer().setBackgroundColor(Color.rgb(230, 230, 230));
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(9);
         graph.getViewport().setMinY(15.0);

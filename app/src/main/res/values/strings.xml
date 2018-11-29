@@ -19,4 +19,6 @@
     <string name="version">Version 0.5</string>
     <string name="copyright">© 2018 GrainControl "\n" All rights reserved.</string>
     <string name="avg_temperature_graph">Average temperature graph</string>
+    <string name="setpoint_legend">Setpoint</string>
+    <string name="avg_temp_legend">Avg Temp.</string>
 </resources>
