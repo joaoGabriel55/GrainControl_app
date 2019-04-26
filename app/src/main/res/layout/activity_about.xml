@@ -14,6 +14,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/background"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="@+id/frameLayout"
         app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
@@ -98,6 +99,22 @@
                 app:layout_constraintEnd_toEndOf="@+id/imageView3"
                 app:layout_constraintStart_toStartOf="@+id/imageView3"
                 app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="175dp"
+                android:layout_height="145dp"
+                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/logotipo_negativo_ufrn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/copyrights"
+                app:layout_constraintVertical_bias="0.0" />
         </android.support.constraint.ConstraintLayout>
 
     </FrameLayout>
